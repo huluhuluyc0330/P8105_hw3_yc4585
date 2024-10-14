@@ -1,0 +1,80 @@
+---
+title: "p8105_hw3_yc4585"
+output: github_document
+date: "2024-10-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+# Problem 2
+### load and clean data
+```{r message=FALSE}
+accel_df=read_csv("./hw3_data/nhanes_accel.csv") |>
+  janitor::clean_names()
+demo_df=read_csv("./hw3_data/nhanes_covar.csv",skip = 4) |>
+  janitor::clean_names() |>
+  na.omit()
+combined_ac_df=left_join(demo_df,accel_df,by="seqn") |>
+  filter(age>21) |>
+  mutate(
+    sex = factor(
+      sex, levels = c(1, 2), 
+      labels = c("male", "female"))) 
+```
+### table of gender and education
+```{r message=FALSE,warning=FALSE}
+gender_edu_table=
+combined_ac_df |>
+  group_by(sex) |>
+  summarise(education_level=education) |>
+  count(sex,education_level) |>
+  pivot_wider(
+    names_from = education_level,
+    values_from = n
+  ) |>
+  rename(
+    education_level_1="1",
+    education_level_2="2",
+    education_level_3="3"
+  )
+
+```
+```{r}
+print(gender_edu_table)
+```
+
+### plot of age distribution of different gender in each education level
+```{r warning=FALSE}
+age_dist_plot=
+combined_ac_df |>
+  group_by(sex,age) |>
+  summarise(education_level=education) |>
+  ggplot(aes(x=age,fill=sex)) +
+  geom_histogram(position = "dodge", binwidth = 7) +
+  facet_grid(. ~ education_level) +
+  labs(title = 'Age Distrbution of Different Genders in Each Education Level',
+       subtitle = 'Eudcation Level',
+       x = 'Age',
+       y = 'Number',
+       fill = 'sex') +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),  
+        plot.subtitle = element_text(hjust = 0.5))
+
+print(age_dist_plot)
+```
+
+For the table, we can see that at education levels 1 and 3, the number of males and females is about the same, but at education level 2, the number of males is significantly higher than that of females.
+
+As for the plot, overall, the number of people at education level 3 is the highest, while education level 2 has the lowest number of individuals. Considering gender, we observe that at education level 1, among those around 20 years old, men outnumber women. However, as age increases, the number of women also rises, and in the age group over 70, the number of men and women is about the same.
+
+At education level 2, in the younger and middle-aged groups, men generally outnumber women, but in older age groups, women equal or even surpass men in number. For education level 3, the middle age group has more women than men, while at ages around 20 and 80, there are more men than women.
