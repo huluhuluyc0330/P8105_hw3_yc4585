@@ -99,6 +99,39 @@ combined_ac_df |>
 print(total_act_plot)
 ```
 
-Across all three education levels, middle-aged women have a higher total level of activity compared to both younger and older age groups. In education level 1, men around 60 years old show a peak in total activities.
+Across all three education levels, middle-aged women have a higher total level of activity compared to their younger and older age groups. In education level 1, men around 60 years old show a peak in total activities.
 
 For both education levels 2 and 3, middle-aged women engage in more total activities than men. However, in the age group over 70 years old, men in both groups have more total activities than women. 
+### plot of 24-hour activity
+```{r}
+act_24_plot=
+combined_ac_df |>
+  pivot_longer(
+      min1:min45,
+      names_to = "time", 
+      values_to = "mins") |>
+  mutate(time = as.numeric(gsub("min", "", time))) |>
+  ggplot(aes(x=time,y=mins,color=sex))+
+  geom_point(alpha=0.25) +
+  geom_smooth(method=lm,se = FALSE) +
+  facet_grid(. ~ education) +
+  labs(title = "Activity Over the Course of Day",
+      subtitle = 'Eudcation Level',
+       x = "Time (min1 to min45)",
+       y = "Minutes of Activity",
+       color = "Sex") +
+  theme(plot.title = element_text(hjust = 0.5),  
+        plot.subtitle = element_text(hjust = 0.5))
+
+print(act_24_plot)
+```
+
+In the plot, we used a linear model for fitting the data. For the three different education levels across both sexes, it is evident that activity time decreases over time. Additionally, for all three education levels, males demonstrate more activity time than females; however, as education level increases, the gap between the two narrows.
+
+
+
+
+
+
+
+
