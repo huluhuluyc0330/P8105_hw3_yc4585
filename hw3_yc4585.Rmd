@@ -128,7 +128,45 @@ print(act_24_plot)
 
 In the plot, we used a linear model for fitting the data. For the three different education levels across both sexes, it is evident that activity time decreases over time. Additionally, for all three education levels, males demonstrate more activity time than females; however, as education level increases, the gap between the two narrows.
 
+# Problem 3
+### import and clean data
+```{r message=FALSE}
+Jan_2020=read_csv("./hw3_data/citibike/Jan 2020 Citi.csv") |>
+  janitor::clean_names() |>
+  mutate(year=2020,month="January")
 
+
+Jan_2024=read_csv("./hw3_data/citibike/Jan 2024 Citi.csv") |>
+  janitor::clean_names() |>
+  mutate(year=2024,month="January")
+
+
+July_2020=read_csv("./hw3_data/citibike/July 2020 Citi.csv") |>
+  janitor::clean_names() |>
+  mutate(year=2020,month="July")
+
+July_2024=read_csv("./hw3_data/citibike/July 2024 Citi.csv") |>
+  janitor::clean_names() |>
+  mutate(year=2024,month="July")
+
+combined_bike_df <- bind_rows(Jan_2020, July_2020,Jan_2024,July_2024)
+
+```
+In the combined_bike_df dataset, we have information about the year, month, and weekday when each ride took place, the user ID, membership status, and the type of bike chosen. Additionally, the dataset provides details about the trip, including the start and end stations as well as the duration.
+### ride number by membership status
+```{r}
+table_ride_number=
+combined_bike_df |>
+  group_by(year,month) |>
+  count(member_casual) |>
+  pivot_wider(
+    names_from = member_casual,
+    values_from = n
+  ) |>
+  knitr::kable()
+
+print(table_ride_number)
+```
 
 
 
