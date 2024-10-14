@@ -94,7 +94,7 @@ combined_ac_df |>
 print(gender_edu_table)
 ```
 
-### plot of age distribution of different gender in each education level
+### plot of age distribution of different gender
 ```{r warning = FALSE}
 age_dist_plot =
 combined_ac_df |>
