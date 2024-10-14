@@ -4,26 +4,68 @@ output: github_document
 date: "2024-10-14"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r message=FALSE}
+```{r message = FALSE}
+library(p8105.datasets)
 library(readr)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 ```
+# Problem 1
+```{r}
+data("ny_noaa")
+prcp_missing = ny_noaa[is.na(ny_noaa$prcp), ]
+snow_missing = ny_noaa[is.na(ny_noaa$snow), ]
+snwd_missing = ny_noaa[is.na(ny_noaa$snwd), ]
+tmax_missing = ny_noaa[is.na(ny_noaa$tmax), ]
+tmin_missing = ny_noaa[is.na(ny_noaa$tmin), ]
+
+```
+This dataset has 2595176 rows and 7 columns,the main variables includes id, date, prcp, snow,snwd,tmax amd tmin. The prcp has 145838 missing values, snow column has 381221 missing values
+```{r}
+ny_noaa  |>
+  janitor::clean_names() |>
+  separate(date, into = c("year", "month","day"), sep = "-") 
+
+ny_noaa |>
+  count(snow) |>
+  arrange(desc(n))
+```
+0 is the most commonly observed value, because 0 means no snow and in New York, the days of no snow is more than the days snow.
+
+### plot of average tmax
+```{r}
+tmax_plot=
+ny_noaa |>
+  separate(date, into = c("year", "month","day"), sep = "-")  |>
+  group_by(id,year,month) |>
+  filter(month=="01"|month=="02"|month=="03"|month=="04"|month=="05"|month=="06"|month=="07") |>
+  summarise(mean_tmax = mean(as.numeric(tmax),na.rm = TRUE)) |>
+  ggplot(aes(x = year,y = mean_tmax)) +
+  geom_point() +
+  facet_wrap(~month)
+
+print(tmax_plot)
+```
+
+
+
 
 # Problem 2
 ### load and clean data
-```{r message=FALSE}
-accel_df=read_csv("./hw3_data/nhanes_accel.csv") |>
+```{r message = FALSE}
+accel_df = read_csv("./hw3_data/nhanes_accel.csv") |>
   janitor::clean_names()
-demo_df=read_csv("./hw3_data/nhanes_covar.csv",skip = 4) |>
+
+demo_df = read_csv("./hw3_data/nhanes_covar.csv",skip = 4) |>
   janitor::clean_names() |>
   na.omit()
-combined_ac_df=left_join(demo_df,accel_df,by="seqn") |>
+
+combined_ac_df = left_join(demo_df,accel_df,by="seqn") |>
   filter(age>21) |>
   mutate(
     sex = factor(
@@ -31,11 +73,11 @@ combined_ac_df=left_join(demo_df,accel_df,by="seqn") |>
       labels = c("male", "female"))) 
 ```
 ### table of gender and education
-```{r message=FALSE,warning=FALSE}
-gender_edu_table=
+```{r message = FALSE,warning = FALSE}
+gender_edu_table =
 combined_ac_df |>
   group_by(sex) |>
-  summarise(education_level=education) |>
+  summarise(education_level = education) |>
   count(sex,education_level) |>
   pivot_wider(
     names_from = education_level,
@@ -53,12 +95,12 @@ print(gender_edu_table)
 ```
 
 ### plot of age distribution of different gender in each education level
-```{r warning=FALSE}
-age_dist_plot=
+```{r warning = FALSE}
+age_dist_plot =
 combined_ac_df |>
   group_by(sex,age) |>
-  summarise(education_level=education) |>
-  ggplot(aes(x=age,fill=sex)) +
+  summarise(education_level = education) |>
+  ggplot(aes(x = age,fill = sex)) +
   geom_histogram(position = "dodge", binwidth = 7) +
   facet_grid(. ~ education_level) +
   labs(title = 'Age Distrbution of Different Genders in Each Education Level',
@@ -79,12 +121,12 @@ As for the plot, overall, the number of people at education level 3 is the highe
 At education level 2, in the younger and middle-aged groups, men generally outnumber women, but in older age groups, women equal or even surpass men in number. For education level 3, the middle age group has more women than men, while at ages around 20 and 80, there are more men than women.
 ### total activity against age
 ```{r}
-total_act_plot=
+total_act_plot =
 combined_ac_df |>
   group_by(seqn,age,sex,education) |>
-  summarise(sum_mins=sum(min1:min45)) |>
-  ggplot(aes(x=age,y=sum_mins,color=sex)) +
-  geom_point(alpha=0.5) +
+  summarise(sum_mins = sum(min1:min45)) |>
+  ggplot(aes(x = age,y = sum_mins,color = sex)) +
+  geom_point(alpha = 0.5) +
   geom_smooth(se = FALSE) +
   labs(title = 'Total Activities against Age by Gender and Education Level',
        subtitle = 'Eudcation Level',
@@ -111,9 +153,9 @@ combined_ac_df |>
       names_to = "time", 
       values_to = "mins") |>
   mutate(time = as.numeric(gsub("min", "", time))) |>
-  ggplot(aes(x=time,y=mins,color=sex))+
-  geom_point(alpha=0.25) +
-  geom_smooth(method=lm,se = FALSE) +
+  ggplot(aes(x = time,y = mins,color = sex))+
+  geom_point(alpha = 0.25) +
+  geom_smooth(method = lm,se = FALSE) +
   facet_grid(. ~ education) +
   labs(title = "Activity Over the Course of Day",
       subtitle = 'Eudcation Level',
@@ -130,24 +172,24 @@ In the plot, we used a linear model for fitting the data. For the three differen
 
 # Problem 3
 ### import and clean data
-```{r message=FALSE}
-Jan_2020=read_csv("./hw3_data/citibike/Jan 2020 Citi.csv") |>
+```{r message = FALSE}
+Jan_2020 = read_csv("./hw3_data/citibike/Jan 2020 Citi.csv") |>
   janitor::clean_names() |>
-  mutate(year=2020,month="January")
+  mutate(year = 2020,month = "January")
 
 
-Jan_2024=read_csv("./hw3_data/citibike/Jan 2024 Citi.csv") |>
+Jan_2024 = read_csv("./hw3_data/citibike/Jan 2024 Citi.csv") |>
   janitor::clean_names() |>
-  mutate(year=2024,month="January")
+  mutate(year = 2024,month = "January")
 
 
-July_2020=read_csv("./hw3_data/citibike/July 2020 Citi.csv") |>
+July_2020 = read_csv("./hw3_data/citibike/July 2020 Citi.csv") |>
   janitor::clean_names() |>
-  mutate(year=2020,month="July")
+  mutate(year = 2020,month = "July")
 
-July_2024=read_csv("./hw3_data/citibike/July 2024 Citi.csv") |>
+July_2024 = read_csv("./hw3_data/citibike/July 2024 Citi.csv") |>
   janitor::clean_names() |>
-  mutate(year=2024,month="July")
+  mutate(year = 2024,month = "July")
 
 combined_bike_df <- bind_rows(Jan_2020, July_2020,Jan_2024,July_2024)
 
@@ -155,7 +197,7 @@ combined_bike_df <- bind_rows(Jan_2020, July_2020,Jan_2024,July_2024)
 In the combined_bike_df dataset, we have information about the year, month, and weekday when each ride took place, the user ID, membership status, and the type of bike chosen. Additionally, the dataset provides details about the trip, including the start and end stations as well as the duration.
 ### ride number by membership status
 ```{r}
-table_ride_number=
+table_ride_number =
 combined_bike_df |>
   group_by(year,month) |>
   count(member_casual) |>
@@ -171,12 +213,12 @@ From the table, we can see that the number of Citi Bike members has been increas
 
 ### table of 5 most popular starting station for 7,2024
 ```{r}
-popular_5_df=
+popular_5_df =
 July_2024 |>
   group_by(start_station_name) |>
   count(start_station_name) |>
   arrange(desc(n)) |> 
-  rename(number_rides_origin=n) |>
+  rename(number_rides_origin = n) |>
   head(5) |>
   knitr::kable()
 
@@ -184,11 +226,11 @@ print(popular_5_df)
 ```
 ### plot of different effections on duration
 ```{r}
-median_duration_plot=
+median_duration_plot =
   combined_bike_df |>
   group_by(year,month,weekdays) |>
-  summarise(median_duration=median(duration,na.rm=TRUE)) |>
-  ggplot(aes(x=weekdays,y=median_duration,color=month)) +
+  summarise(median_duration = median(duration,na.rm = TRUE)) |>
+  ggplot(aes(x = weekdays,y = median_duration,color = month)) +
   geom_point() +
   facet_wrap(~ year) +
   labs(title = "Median Ride Duration by Day of the Week, Month, and Year",
