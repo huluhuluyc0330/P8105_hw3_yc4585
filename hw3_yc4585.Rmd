@@ -125,7 +125,9 @@ For the table, we can see that at education levels 1 and 3, the number of males 
 As for the plot, overall, the number of people at education level 3 is the highest, while education level 1 has the lowest number of individuals. Considering gender, we observe that at education level 1, among those around 20 years old, men outnumber women. However, as age increases, the number of women also rises, and in the age group over 70, the number of men and women is about the same.
 
 At education level 2, in the younger and middle-aged groups, men generally outnumber women, but in older age groups, women equal or even surpass men in number. For education level 3, the middle age group has more women than men, while at ages around 20 and 80, there are more men than women.
+
 ### total activity against age
+
 ```{r}
 total_act_plot =
 combined_ac_df |>
