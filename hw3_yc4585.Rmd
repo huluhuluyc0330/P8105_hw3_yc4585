@@ -94,7 +94,12 @@ combined_ac_df |>
 print(gender_edu_table)
 ```
 
-### plot of age distribution of different gender
+```{r}
+git config -–global user.name "hulu" 
+git config –-global user.email "xxx@xxx.com" 
+```
+
+### plot of age distribution 
 ```{r warning = FALSE}
 age_dist_plot =
 combined_ac_df |>
