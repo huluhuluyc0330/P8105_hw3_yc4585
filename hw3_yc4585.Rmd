@@ -37,6 +37,7 @@ ny_noaa |>
 ```
 0 is the most commonly observed value, because 0 means no snow and in New York, the days of no snow is more than the days snow.
 
+
 ### plot of average tmax
 ```{r}
 tmax_plot=
@@ -56,7 +57,7 @@ print(tmax_plot)
 
 
 # Problem 2
-### load and clean data
+### load ,clean and tidy data
 ```{r message = FALSE}
 accel_df = read_csv("./hw3_data/nhanes_accel.csv") |>
   janitor::clean_names()
